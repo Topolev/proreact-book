@@ -1,26 +1,26 @@
-import React, {Component} from "react";
+import React, {Component, PropTypes} from "react";
 import {CheckList} from "./CheckList";
 import marked from 'marked';
 
 export class Card extends React.Component {
-    constructor(){
+    constructor() {
         super(...arguments);
         this.state = {
             showDetails: false
         }
     }
 
-    toggleDetails(){
-        this.setState({showDetails:!this.state.showDetails});
+    toggleDetails() {
+        this.setState({showDetails: !this.state.showDetails});
     }
 
-    render(){
+    render() {
         let cardDetail;
-        if (this.state.showDetails){
+        if (this.state.showDetails) {
             cardDetail = (
                 <div className="card__details">
-                    <span dangerouslySetInnerHTML={{__html:marked(this.props.description)}} />
-                    <CheckList cardId={this.props.id} tasks={this.props.tasks} />
+                    <span dangerouslySetInnerHTML={{__html: marked(this.props.description)}}/>
+                    <CheckList cardId={this.props.id} tasks={this.props.tasks}/>
                 </div>
             );
         }
@@ -30,16 +30,16 @@ export class Card extends React.Component {
             zIndex: -1,
             top: 0,
             bottom: 0,
-            left:0,
+            left: 0,
             width: 7,
             backgroundColor: this.props.color
-        }
+        };
 
-        return(
+        return (
             <div className="card">
-                <div style={sideColor}></div>
+                <div style={sideColor}/>
                 <div className={
-                    this.state.showDetails? "card__title card__title--is-open": "card__title"
+                    this.state.showDetails ? "card__title card__title--is-open" : "card__title"
                 }
                      onClick={this.toggleDetails.bind(this)}>{this.props.title}</div>
                 {cardDetail}
@@ -47,4 +47,24 @@ export class Card extends React.Component {
         );
     }
 
+}
+
+
+let titlePropType = (props, propName, componentName) => {
+    if (props[propName]){
+        let value = props[propName];
+        if (typeof value!=='string' || value.length > 80){
+            return new Error(
+                `${propName} in ${componentName} is longer than 80 symbols`
+            )
+        }
+    }
+}
+
+Card.propTypes = {
+    id: PropTypes.number,
+    description: PropTypes.string,
+    title: titlePropType,
+    color: PropTypes.string,
+    tsks: PropTypes.arrayOf(PropTypes.objwect)
 }

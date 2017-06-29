@@ -1,9 +1,7 @@
-
 import React, {Component} from "react";
 
 import {render} from "react-dom"
 import {KanbanBoard} from "./KanbanBoard";
-
 
 
 let cardsList = [
@@ -40,8 +38,15 @@ let cardsList = [
             }
         ]
     },
+    {
+        id: 3,
+        title: "This is a new card with a very very very long title, thus having more than 80 characteristics.",
+        description: "I should read the whole book",
+        color: '#BD8D31',
+        status: "in-progress",
+        tasks: []
+    }
 ];
-
 
 
 render(<KanbanBoard cards={cardsList}/>, window.document.getElementById("app"));

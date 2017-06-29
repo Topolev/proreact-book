@@ -1,23 +1,28 @@
 /**
  * Created by uladzimir on 29.6.17.
  */
-import React, {Component} from "react";
+import React, {Component, PropTypes} from "react";
 import {List} from "./List";
-import {Search} from "./Search";
 
 export class KanbanBoard extends React.Component {
 
     render() {
         return (
             <div>
-                <Search/>
                 <List
-                    cards={this.props.cards.filter((card) => card.status === "todo")}/>
+                    cards={this.props.cards.filter((card) => card.status === "todo")}
+                    title={"TO DO"}/>
                 <List
-                    cards={this.props.cards.filter((card) => card.status === "in-progress")}/>
+                    cards={this.props.cards.filter((card) => card.status === "in-progress")}
+                    title={"IN PROGRESS"}/>
                 <List
-                    cards={this.props.cards.filter((card) => card.status === "done")}/>
+                    cards={this.props.cards.filter((card) => card.status === "done")}
+                    title={"DONE"}/>
             </div>
         );
     }
+}
+
+KanbanBoard.propTypes = {
+    cards: PropTypes.arrayOf(PropTypes.object)
 }

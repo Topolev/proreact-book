@@ -1,7 +1,7 @@
 /**
  * Created by uladzimir on 29.6.17.
  */
-import React, {Component} from "react";
+import React, {Component, PropTypes} from "react";
 import {Card} from "./Card";
 
 export class List extends React.Component {
@@ -23,4 +23,9 @@ export class List extends React.Component {
         );
 
     }
+}
+
+List.propTypes = {
+    title: PropTypes.string.isRequired,
+    cards: PropTypes.arrayOf(PropTypes.object)
 }
