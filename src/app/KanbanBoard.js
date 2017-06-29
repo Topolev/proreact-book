@@ -11,13 +11,16 @@ export class KanbanBoard extends React.Component {
             <div>
                 <List
                     cards={this.props.cards.filter((card) => card.status === "todo")}
-                    title={"TO DO"}/>
+                    title={"TO DO"}
+                    taskCallbacks = {this.props.taskCallbacks}/>
                 <List
                     cards={this.props.cards.filter((card) => card.status === "in-progress")}
-                    title={"IN PROGRESS"}/>
+                    title={"IN PROGRESS"}
+                    taskCallbacks = {this.props.taskCallbacks}/>
                 <List
                     cards={this.props.cards.filter((card) => card.status === "done")}
-                    title={"DONE"}/>
+                    title={"DONE"}
+                    taskCallbacks = {this.props.taskCallbacks}/>
             </div>
         );
     }

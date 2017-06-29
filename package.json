@@ -22,8 +22,11 @@
     "webpack-dev-server": "^2.5.0"
   },
   "dependencies": {
+    "babel-polyfill": "^6.23.0",
     "marked": "^0.3.6",
     "react": "^15.6.1",
-    "react-dom": "^15.6.1"
+    "react-addons-update": "^15.6.0",
+    "react-dom": "^15.6.1",
+    "whatwg-fetch": "^2.0.3"
   }
 }

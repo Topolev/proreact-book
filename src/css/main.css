@@ -97,10 +97,11 @@ ul {
     border-top: dashed 1px #ddd;
 }
 
-.checklist__task--remove:after{
+.checklist__task--delete:after{
     display: inline-block;
+    font-family: 'icomoon' !important;
     color: #d66;
-    content: "+";
+    content: "\f00d";
 }
 
 .checklist--add-task {
