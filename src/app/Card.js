@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from "react";
 import {CheckList} from "./CheckList";
 import marked from 'marked';
+import ReactCSSTransitionGroup from "react-addons-css-transition-group"
 
 export class Card extends React.Component {
     constructor() {
@@ -23,7 +24,7 @@ export class Card extends React.Component {
                     <CheckList
                         cardId={this.props.id}
                         tasks={this.props.tasks}
-                        taskCallbacks = {this.props.taskCallbacks}/>
+                        taskCallbacks={this.props.taskCallbacks}/>
                 </div>
             );
         }
@@ -45,7 +46,11 @@ export class Card extends React.Component {
                     this.state.showDetails ? "card__title card__title--is-open" : "card__title"
                 }
                      onClick={this.toggleDetails.bind(this)}>{this.props.title}</div>
-                {cardDetail}
+                <ReactCSSTransitionGroup transitionName="toggle"
+                                         transitionEnterTimeout={250}
+                                         transitionLeaveTimeout={250}>
+                    {cardDetail}
+                </ReactCSSTransitionGroup>
             </div>
         );
     }
@@ -54,9 +59,9 @@ export class Card extends React.Component {
 
 
 let titlePropType = (props, propName, componentName) => {
-    if (props[propName]){
+    if (props[propName]) {
         let value = props[propName];
-        if (typeof value!=='string' || value.length > 80){
+        if (typeof value !== 'string' || value.length > 80) {
             return new Error(
                 `${propName} in ${componentName} is longer than 80 symbols`
             )
