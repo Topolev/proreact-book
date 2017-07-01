@@ -27,64 +27,98 @@ export class KanbanBoardContainer extends React.Component {
             .then((responseJSON) => {
                 this.setState({cards: responseJSON})
             })
-            .catch((error)=>{
-            console.log('Error fetching and parsing data', error)
+            .catch((error) => {
+                console.log('Error fetching and parsing data', error)
             })
     }
 
-    addTask(cardId, taskName){
-        console.log(taskName);
+    addTask(cardId, taskName) {
         let cardIndex = this.state.cards.findIndex(card => card.id === cardId);
+        let prevState = this.state;
         let newTask = {
-            id:Date.now(),
+            id: Date.now(),
             name: taskName,
-            done:false
+            done: false
         };
 
         let newState = update(this.state.cards, {
-            [cardIndex]:{
-                tasks:{$push: [newTask]}
+            [cardIndex]: {
+                tasks: {$push: [newTask]}
             }
         });
         this.setState({cards: newState});
         fetch(`${API_URL}/cards/${cardId}/tasks`, {
-            method:'post',
-            headers:API_HEADERS,
+            method: 'post',
+            headers: API_HEADERS,
             body: JSON.stringify(newTask)
-        });
-
+        })
+            .then((response) => {
+                if (response.ok) {
+                    return response.json()
+                } else {
+                    throw new Error("Server response wasn't OK");
+                }
+            })
+            .then((responseData) => {
+                // When the server returns the definitive ID
+                // used for the new Task on the server, update it on React
+                newTask.id = responseData.id;
+                this.setState({cards: newState});
+            })
+            .catch((error) => {
+                this.setState(prevState);
+            });
     }
-    deleteTask(cardId, taskId, taskIndex){
-        let cardIndex = this.state.cards.findIndex((card)=> card.id===cardId);
-        let nextState = update(this.state.cards,{
+
+    deleteTask(cardId, taskId, taskIndex) {
+        let prevState = this.state;
+        let cardIndex = this.state.cards.findIndex((card) => card.id === cardId);
+        let nextState = update(this.state.cards, {
             [cardIndex]: {
                 tasks: {$splice: [[taskIndex, 1]]}
             }
         });
         this.setState({cards: nextState});
         fetch(`${API_URL}/cards/${cardId}/tasks/${taskId}`, {
-            method:'delete',
-            headers:API_HEADERS
-        });
+            method: 'delete',
+            headers: API_HEADERS
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Server response wasn't OK");
+                }
+            })
+            .catch((error) => {
+                this.setState(prevState);
+            });
     }
-    toggleTask(cardId, taskId, taskIndex){
-        console.log("togletask task");
-        let cardIndex = this.state.cards.findIndex((card)=>card.id===cardId);
+
+    toggleTask(cardId, taskId, taskIndex) {
+        let prevState = this.state;
+        let cardIndex = this.state.cards.findIndex((card) => card.id === cardId);
         let nextState = update(this.state.cards, {
             [cardIndex]: {
-                tasks:{
+                tasks: {
                     [taskIndex]: {
-                        done: {$apply: (done)=> !done}
+                        done: {$apply: (done) => !done}
                     }
                 }
             }
         });
         this.setState({cards: nextState});
         fetch(`${API_URL}/cards/${cardId}/tasks/${taskId}`, {
-            method:'put',
-            headers:API_HEADERS,
-            body: JSON.stringify({done:nextState[cardIndex].tasks[taskIndex].done})
-        });
+            method: 'put',
+            headers: API_HEADERS,
+            body: JSON.stringify({done: nextState[cardIndex].tasks[taskIndex].done})
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Server response wasn't OK");
+                }
+            })
+            .catch((error) => {
+                this.setState(prevState);
+            });
 
 
     }
@@ -99,7 +133,6 @@ export class KanbanBoardContainer extends React.Component {
             }}
         />
     }
-
 
 
 }
