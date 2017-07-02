@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from "react";
 
 
-export class CheckList extends Component {
+export default class CheckList extends Component {
 
     addNewTask(ev){
     if (ev.key ==='Enter'){

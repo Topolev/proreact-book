@@ -2,7 +2,7 @@
  * Created by vladimirtopolev on 29.06.17.
  */
 import React, {Component, PropTypes} from "react";
-import {KanbanBoard} from "./KanbanBoard";
+import KanbanBoard from "./KanbanBoard";
 import "whatwg-fetch";
 import "babel-polyfill";
 import update from "react-addons-update";
@@ -123,6 +123,63 @@ export class KanbanBoardContainer extends React.Component {
 
     }
 
+    updateCardStatus(cardId, listId) {
+        console.log(cardId, listId);
+        let cardIndex = this.state.cards.findIndex((card) => card.id === cardId);
+        let card = this.state.cards[cardIndex];
+        console.log("status", card.status)
+        if (card.status !== listId) {
+            this.setState(update(this.state, {
+                cards: {
+                    [cardIndex]: {
+                        status: {$set: listId}
+                    }
+                }
+            }))
+        }
+    }
+
+    updateCardPosition(cardId, afterId) {
+        if (cardId !== afterId) {
+            let cardIndex = this.state.cards.findIndex((card) => card.id === cardId);
+            let card = this.state.cards[cardIndex];
+            let afterIndex = this.state.cards.findIndex((card) => cardId === afterId);
+            this.setState(update(this.state, {
+                cards: {
+                    $splice: [
+                        [cardIndex, 1],
+                        [afterIndex, 0, card]
+                    ]
+                }
+            }))
+        }
+    }
+
+    persistCardDrag(cardId, status) {
+        let cardIndex = this.state.cards.findIndex((card) => card.id === cardId);
+        let card = this.state.cards[cardIndex];
+
+        fetch(`${API_URL}/cards/${cardId}`, {
+            method: 'put',
+            headers: API_HEADERS,
+            body: JSON.stringify({status: card.status, row_order_position: cardIndex})
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Server responce wasn't OK")
+                }
+            })
+            .catch((error)=>{
+            this.setState(update(this.state, {
+                cards: {
+                    [cardIndex]: {
+                        status: {$set: status}
+                    }
+                }
+            }))
+            })
+    }
+
     render() {
         return <KanbanBoard
             cards={this.state.cards}
@@ -131,6 +188,11 @@ export class KanbanBoardContainer extends React.Component {
                 delete: this.deleteTask.bind(this),
                 add: this.addTask.bind(this)
             }}
+            cardCallbacks={{
+                updateStatus: this.updateCardStatus.bind(this),
+                updatePosition: this.updateCardPosition.bind(this)
+            }}
+
         />
     }
 

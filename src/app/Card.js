@@ -1,9 +1,40 @@
 import React, {Component, PropTypes} from "react";
-import {CheckList} from "./CheckList";
+import CheckList from "./CheckList";
 import marked from 'marked';
 import ReactCSSTransitionGroup from "react-addons-css-transition-group"
+import {DragSource, DropTarget} from "react-dnd";
+import constants from "./constant";
 
-export class Card extends React.Component {
+const cardDragSpec = {
+    beginDrag(props){
+        console.log("beginDrag", props);
+        return {
+            id: props.id
+        }
+    }
+    // TODO add endDrag to save the changed order of cards after dropping
+};
+
+const cardDropSpec = {
+    hover(props, monitor){
+        const draggedId = monitor.getItem().id;
+        console.log("underCard",props.id);
+        props.cardCallbacks.updatePosition(draggedId, props.id);
+    }
+};
+
+let collectDrag = (connect, monitor) => {
+    return {
+        connectDragSource: connect.dragSource(),
+    }
+};
+let collectDrop = (connect, monitor) =>{
+    return{
+        connectDropTarget: connect.dropTarget()
+    }
+}
+
+class Card extends React.Component {
     constructor() {
         super(...arguments);
         this.state = {
@@ -16,6 +47,7 @@ export class Card extends React.Component {
     }
 
     render() {
+        let {connectDropTarget, connectDragSource} = this.props;
         let cardDetail;
         if (this.state.showDetails) {
             cardDetail = (
@@ -24,7 +56,8 @@ export class Card extends React.Component {
                     <CheckList
                         cardId={this.props.id}
                         tasks={this.props.tasks}
-                        taskCallbacks={this.props.taskCallbacks}/>
+                        taskCallbacks={this.props.taskCallbacks}
+                        cardCallbacks={this.props.cardCallbacks}/>
                 </div>
             );
         }
@@ -39,7 +72,7 @@ export class Card extends React.Component {
             backgroundColor: this.props.color
         };
 
-        return (
+        return connectDropTarget(connectDragSource(
             <div className="card">
                 <div style={sideColor}/>
                 <div className={
@@ -52,7 +85,7 @@ export class Card extends React.Component {
                     {cardDetail}
                 </ReactCSSTransitionGroup>
             </div>
-        );
+        ));
     }
 
 }
@@ -67,7 +100,7 @@ let titlePropType = (props, propName, componentName) => {
             )
         }
     }
-}
+};
 
 Card.propTypes = {
     id: PropTypes.number,
@@ -75,4 +108,9 @@ Card.propTypes = {
     title: titlePropType,
     color: PropTypes.string,
     tsks: PropTypes.arrayOf(PropTypes.objwect)
-}
+};
+
+const dragHighOrderCard =  DragSource(constants.CARD, cardDragSpec, collectDrag)(Card);
+const dropHighOrderCard = DropTarget(constants.CARD, cardDropSpec, collectDrop)(dragHighOrderCard);
+
+export default dropHighOrderCard;
